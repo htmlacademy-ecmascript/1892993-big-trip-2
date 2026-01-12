@@ -3,6 +3,7 @@ import { render, replace } from '../framework/render.js';
 import ListEventsView from '../view/list-events.js';
 import ItemEventView from '../view/item-event.js';
 import EditEventView from '../view/edit-event.js';
+import LackDataView from '../view/lack-data-view.js';
 export default class BoardPresenter {
   #boardContainer = null;
   #pointsModel = null;
@@ -64,7 +65,12 @@ export default class BoardPresenter {
   }
 
   #renderBoard() {
-    render(new FilterView, this.#boardContainer);
+    if (this.#boardPoints.length === 0) {
+      render(new LackDataView(), this.#boardContainer);
+      return;
+    }
+
+    render(new FilterView(), this.#boardContainer);
     render(this.#listEventsComponent, this.#boardContainer);
     for (let i = 0; i < this.#boardPoints.length; i++) {
       this.#renderItemEvent(this.#pointsModel, this.#boardPoints[i]);
