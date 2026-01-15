@@ -1,0 +1,113 @@
+import { render, replace, remove } from '../framework/render.js';
+import ItemEventView from '../view/item-event.js';
+import EditEventView from '../view/edit-event.js';
+
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
+export default class EventPresenter {
+  #listEventsComponent = null;
+  #eventComponent = null;
+  #eventEditComponent = null;
+  #handleDataChange = null;
+  #handleModeChange = null;
+
+  #mode = Mode.DEFAULT;
+  #pointsModel = null;
+  #point = null;
+
+  constructor({listEventsComponent, onDataChange, onModeChange}) {
+    this.#listEventsComponent = listEventsComponent;
+    this.#handleDataChange = onDataChange;
+    this.#handleModeChange = onModeChange;
+  }
+
+  init(pointsModel, point) {
+    this.#pointsModel = pointsModel;
+    this.#point = point;
+
+    const prevEventComponent = this.#eventComponent;
+    const prevEventEditComponent = this.#eventEditComponent;
+
+    this.#eventComponent = new ItemEventView({
+      pointsModel: this.#pointsModel,
+      point: this.#point,
+      onEditClick: () => this.#replaceCardToForm(),
+      onFavoriteClick: this.#handleFavoriteClick,
+    });
+
+    this.#eventEditComponent = new EditEventView({
+      pointsModel: this.#pointsModel,
+      point: this.#point,
+      onFormSubmit: this.#handleFormSubmit,
+      onFormCloseClick: () => this.#replaceFormToCard(),
+    });
+
+    if (prevEventComponent === null || prevEventEditComponent === null) {
+      render(this.#eventComponent, this.#listEventsComponent);
+
+      return;
+    }
+
+    // if (this.#listEventsComponent.contains(prevEventComponent.element)) {
+    //   replace(this.#eventComponent, prevEventComponent);
+    // }
+
+    // if (this.#listEventsComponent.contains(prevEventEditComponent.element)) {
+    //   replace(this.#eventEditComponent, prevEventEditComponent);
+    // }
+
+    if (this.#mode === Mode.DEFAULT) {
+      replace(this.#eventComponent, prevEventComponent);
+    }
+
+    if (this.#mode === Mode.EDITING) {
+      replace(this.#eventComponent, prevEventEditComponent);
+    }
+
+    remove(prevEventComponent);
+    remove(prevEventEditComponent);
+  }
+
+  resetView() {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#replaceFormToCard();
+    }
+  }
+
+  destroy() {
+    remove(this.#eventComponent);
+    remove(this.#eventEditComponent);
+  }
+
+  #handleFavoriteClick = () => {
+    this.#handleDataChange({...this.#point, isFavorite: !this.#point.isFavorite});
+  };
+
+  #replaceCardToForm() {
+    replace(this.#eventEditComponent, this.#eventComponent);
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#handleModeChange();
+    this.#mode = Mode.EDITING;
+  }
+
+  #replaceFormToCard() {
+    replace(this.#eventComponent, this.#eventEditComponent);
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#mode = Mode.DEFAULT;
+  }
+
+  #handleFormSubmit = (point) => {
+    this.#handleDataChange(point);
+    this.#replaceFormToCard();
+  };
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      this.#replaceFormToCard();
+    }
+  };
+}
