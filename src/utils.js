@@ -46,3 +46,11 @@ export function getTimePeriod(start, end) {
 export function updateItem(items, update) {
   return items.map((item) => item.id === update.id ? update : item);
 }
+
+export function sortByPrice(eventA, eventB) {
+  return eventB.basePrice - eventA.basePrice;
+}
+
+export function sortByTime(event1, event2) {
+  return dayjs(event2.dateTo).diff(dayjs(event2.dateFrom)) - dayjs(event1.dateTo).diff(dayjs(event1.dateFrom));
+}

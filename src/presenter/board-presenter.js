@@ -1,8 +1,10 @@
-import FilterView from '../view/filter-view.js';
+import SortView from '../view/sort-view.js';
 import { render } from '../framework/render.js';
 import ListEventsView from '../view/list-events.js';
 import EventPresenter from './event-presenter.js';
 import { updateItem } from '../utils.js';
+import { SortType } from '../const.js';
+import { sortByPrice, sortByTime } from '../utils.js';
 
 import LackDataView from '../view/lack-data-view.js';
 export default class BoardPresenter {
@@ -10,8 +12,11 @@ export default class BoardPresenter {
   #pointsModel = null;
   #boardPoints = [];
   #eventsPresenter = new Map();
+  #currentEventType = SortType.DEFAULT;
+  #sourcedBoardEvents = [];
 
   #listEventsComponent = new ListEventsView();
+  #sortComponent = null;
 
   constructor({boardContainer, pointsModel}) {
     this.#boardContainer = boardContainer;
@@ -20,8 +25,41 @@ export default class BoardPresenter {
 
   init() {
     this.#boardPoints = [...this.#pointsModel.getPoint()];
+    this.#sourcedBoardEvents = [...this.#pointsModel.getPoint()];
 
     this.#renderBoard();
+  }
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentEventType === sortType) {
+      return;
+    }
+    this.#sortEvents(sortType);
+    this.#clearEventList();
+    this.#renderItemsEvent();
+  };
+
+  #renderSort() {
+    this.#sortComponent = new SortView({
+      onSortTypeChange: this.#handleSortTypeChange
+    });
+
+    render(this.#sortComponent, this.#boardContainer);
+  }
+
+  #sortEvents(sortType) {
+    switch (sortType) {
+      case SortType.PRICE:
+        this.#boardPoints.sort(sortByPrice);
+        break;
+      case SortType.TIME:
+        this.#boardPoints.sort(sortByTime);
+        break;
+      default:
+        this.#boardPoints = [...this.#sourcedBoardEvents];
+    }
+
+    this.#currentEventType = sortType;
   }
 
   #renderNoEvent() {
@@ -50,8 +88,14 @@ export default class BoardPresenter {
     }
   }
 
+  #clearEventList() {
+    this.#eventsPresenter.forEach((presenter) => presenter.destroy());
+    this.#eventsPresenter.clear();
+  }
+
   #handleEventChange = (updatedEvent) => {
     this.#boardPoints = updateItem(this.#boardPoints, updatedEvent);
+    this.#sourcedBoardEvents = updateItem(this.#sourcedBoardEvents, updatedEvent);
     this.#eventsPresenter.get(updatedEvent.id).init(this.#pointsModel, updatedEvent);
   };
 
@@ -61,7 +105,7 @@ export default class BoardPresenter {
       return;
     }
 
-    render(new FilterView(), this.#boardContainer);
+    this.#renderSort();
     this.#renderItemsEvent();
   }
 }
