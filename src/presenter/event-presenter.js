@@ -51,14 +51,6 @@ export default class EventPresenter {
       return;
     }
 
-    // if (this.#listEventsComponent.contains(prevEventComponent.element)) {
-    //   replace(this.#eventComponent, prevEventComponent);
-    // }
-
-    // if (this.#listEventsComponent.contains(prevEventEditComponent.element)) {
-    //   replace(this.#eventEditComponent, prevEventEditComponent);
-    // }
-
     if (this.#mode === Mode.DEFAULT) {
       replace(this.#eventComponent, prevEventComponent);
     }
@@ -73,6 +65,7 @@ export default class EventPresenter {
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#eventEditComponent.reset(this.#point);
       this.#replaceFormToCard();
     }
   }
@@ -107,6 +100,7 @@ export default class EventPresenter {
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
+      this.#eventEditComponent.reset(this.#point);
       this.#replaceFormToCard();
     }
   };

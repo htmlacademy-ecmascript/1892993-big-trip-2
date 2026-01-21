@@ -31,7 +31,7 @@ export const destinations = [
   },
   {
     id: 'bfa5cb75-a1fe-4b77-a83c-1e528e910e04',
-    description: 'Тара та там, ту та я',
+    description: '',
     name: 'Геленджик',
     pictures: [],
   },
