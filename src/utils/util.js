@@ -14,15 +14,15 @@ export const DateFormat = {
 
 };
 
-export const getDefaultPoint = () => ({
+export const DefaultPoint = {
   basePrice: 0,
   dateFrom: '',
   dateTo: '',
-  destination: 0,
+  destination: '',
   isFavorite: false,
   offers: [],
-  type: 'taxi',
-});
+  type: 'flight'
+};
 
 export function humanizeTaskDueDate(dueDate, dateFormat) {
   return dueDate ? dayjs(dueDate).format(dateFormat).toUpperCase() : '';
@@ -41,10 +41,6 @@ export function getTimePeriod(start, end) {
   }
 
   return `${String(~~(period / MINUTES_IN_DAY)).padStart(2,'0')}D ${String(~~(period % MINUTES_IN_DAY / MINUTES_IN_HOUR)).padStart(2,'0')}H ${String(Math.ceil((period % MINUTES_IN_HOUR))).padStart(2,'0')}M`;
-}
-
-export function updateItem(items, update) {
-  return items.map((item) => item.id === update.id ? update : item);
 }
 
 export function sortByPrice(eventA, eventB) {

@@ -95,5 +95,9 @@ export const offers = [
   {
     type: 'check-in',
     offers: []
+  },
+  {
+    type: 'flight',
+    offers: []
   }
 ];

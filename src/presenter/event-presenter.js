@@ -1,6 +1,7 @@
 import { render, replace, remove } from '../framework/render.js';
 import ItemEventView from '../view/item-event.js';
 import EditEventView from '../view/edit-event.js';
+import { UpdateType, UserAction } from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -34,14 +35,18 @@ export default class EventPresenter {
     this.#eventComponent = new ItemEventView({
       pointsModel: this.#pointsModel,
       point: this.#point,
+      offer: [...this.#pointsModel.getOfferById(this.#point.type, this.#point.offers)],
+      destination: this.#pointsModel.getDestinationById(this.#point.destination),
       onEditClick: () => this.#replaceCardToForm(),
       onFavoriteClick: this.#handleFavoriteClick,
     });
 
     this.#eventEditComponent = new EditEventView({
-      pointsModel: this.#pointsModel,
       point: this.#point,
+      offers: this.#pointsModel.getOffer(),
+      destinations: this.#pointsModel.getDestination(),
       onFormSubmit: this.#handleFormSubmit,
+      onDeleteClick: this.#handleDeleteClick,
       onFormCloseClick: () => this.#replaceFormToCard(),
     });
 
@@ -76,7 +81,11 @@ export default class EventPresenter {
   }
 
   #handleFavoriteClick = () => {
-    this.#handleDataChange({...this.#point, isFavorite: !this.#point.isFavorite});
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      {...this.#point, isFavorite: !this.#point.isFavorite},
+    );
   };
 
   #replaceCardToForm() {
@@ -93,8 +102,20 @@ export default class EventPresenter {
   }
 
   #handleFormSubmit = (point) => {
-    this.#handleDataChange(point);
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
     this.#replaceFormToCard();
+  };
+
+  #handleDeleteClick = (point) => {
+    this.#handleDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
   };
 
   #escKeyDownHandler = (evt) => {

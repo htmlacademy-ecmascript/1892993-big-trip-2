@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { getTimePeriod, humanizeTaskDueDate, DateFormat } from '../utils.js';
+import { getTimePeriod, humanizeTaskDueDate, DateFormat } from '../utils/util.js';
 import dayjs from 'dayjs';
 
 function createItemEventTemplate(point, offer, destination) {
@@ -11,7 +11,7 @@ function createItemEventTemplate(point, offer, destination) {
                 <div class="event__type">
                   <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="${type}">
                 </div>
-                <h3 class="event__title">${type} ${destination.name}</h3>
+                <h3 class="event__title">${type} ${destination ? destination.name : ''}</h3>
                 <div class="event__schedule">
                   <p class="event__time">
                     <time class="event__start-time" datetime="${dayjs(dateFrom).format(DateFormat.dateTimeT)}">${humanizeTaskDueDate(dateFrom, DateFormat.hourMinute)}</time>
@@ -53,12 +53,12 @@ export default class ItemEventView extends AbstractView {
   #handleFavoriteClick = null;
 
 
-  constructor({pointsModel, point, onEditClick, onFavoriteClick}) {
+  constructor({pointsModel, point, offer, destination, onEditClick, onFavoriteClick}) {
     super();
     this.#pointsModel = pointsModel;
     this.#point = point;
-    this.#offer = [...this.#pointsModel.getOfferById(this.#point.type, this.#point.offers)];
-    this.#destination = this.#pointsModel.getDestinationById(this.#point.destination);
+    this.#offer = offer;
+    this.#destination = destination;
     this.#handleEditClick = onEditClick;
     this.#handleFavoriteClick = onFavoriteClick;
 
