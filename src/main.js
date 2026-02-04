@@ -50,6 +50,7 @@ function handleNewEditButtonClick() {
 
 render(newEditButtonComponent, siteTripMainControlsElement, RenderPosition.AFTEREND);
 
+
 pointsModel.init()
   .finally(() => {
     render(newEditButtonComponent, siteTripMainControlsElement, RenderPosition.AFTEREND);
