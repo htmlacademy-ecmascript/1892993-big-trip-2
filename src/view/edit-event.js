@@ -1,5 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { humanizeTaskDueDate, DateFormat } from '../utils/util.js';
+import { humanizeTaskDueDate } from '../utils/util.js';
+import { DateFormat } from '../const.js';
 import flatpickr from 'flatpickr';
 import { DefaultPoint } from '../utils/util.js';
 
@@ -63,10 +64,10 @@ function createGroupDestinationTemplate (allDestinations, type, destination, id)
 function createTimeTemplate(id, dateFrom, dateTo) {
   return `<div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-${id}">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${humanizeTaskDueDate(dateFrom, DateFormat.dateTime)} required>
+            <input required class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${humanizeTaskDueDate(dateFrom, DateFormat.dateTime)}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-${id}">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${humanizeTaskDueDate(dateTo, DateFormat.dateTime)} required>
+            <input required class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${humanizeTaskDueDate(dateTo, DateFormat.dateTime)}">
           </div>
   `;
 }

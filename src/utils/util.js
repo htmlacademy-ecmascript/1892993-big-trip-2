@@ -1,18 +1,5 @@
 import dayjs from 'dayjs';
-
-
-const MILISECONDS_IN_MINUTE = 60000;
-const MINUTES_IN_HOUR = 60;
-const MINUTES_IN_DAY = 1440;
-
-export const DateFormat = {
-  monthDay: 'MMM D',
-  hourMinute: 'HH:mm',
-  yearMonthDay: 'YYYY-MM-DD',
-  dateTime:'DD/MM/YY HH:mm',
-  dateTimeT: 'YYYY-MM-DDTHH:mm'
-
-};
+import { MILISECONDS_IN_MINUTE, MINUTES_IN_HOUR, MINUTES_IN_DAY } from '../const';
 
 export const DefaultPoint = {
   basePrice: 0,

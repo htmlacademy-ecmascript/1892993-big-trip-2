@@ -1,5 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { getTimePeriod, humanizeTaskDueDate, DateFormat } from '../utils/util.js';
+import { getTimePeriod, humanizeTaskDueDate } from '../utils/util.js';
+import { DateFormat } from '../const.js';
 import dayjs from 'dayjs';
 
 function createItemEventTemplate(point, offer, destination) {

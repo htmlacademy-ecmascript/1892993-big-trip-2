@@ -4,6 +4,19 @@ export const SortType = {
   TIME: 'time',
 };
 
+export const MILISECONDS_IN_MINUTE = 60000;
+export const MINUTES_IN_HOUR = 60;
+export const MINUTES_IN_DAY = 1440;
+
+export const DateFormat = {
+  monthDay: 'MMM D',
+  hourMinute: 'HH:mm',
+  yearMonthDay: 'YYYY-MM-DD',
+  dateTime:'DD/MM/YY HH:mm',
+  dateTimeT: 'YYYY-MM-DDTHH:mm'
+
+};
+
 export const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',

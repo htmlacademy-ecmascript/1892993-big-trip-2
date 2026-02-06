@@ -151,7 +151,7 @@ export default class EventPresenter {
     }
 
     const resetFormState = () => {
-      this.#eventEditComponent.updateElement({
+      this.#eventEditComponent?.updateElement({
         isDisabled: false,
         isSaving: false,
         isDeleting: false,
