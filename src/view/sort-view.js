@@ -4,7 +4,7 @@ import { SortType } from '../const.js';
 function createSortTemplate() {
   return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
             <div class="trip-sort__item  trip-sort__item--day">
-              <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" data-sort-type="${SortType.DEFAULT}" checked>
+              <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" data-sort-type="${SortType.DAY}" checked>
               <label class="trip-sort__btn" for="sort-day">Day</label>
             </div>
 

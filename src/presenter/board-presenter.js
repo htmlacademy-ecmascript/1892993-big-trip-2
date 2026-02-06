@@ -3,9 +3,16 @@ import { render, remove } from '../framework/render.js';
 import ListEventsView from '../view/list-events.js';
 import EventPresenter from './event-presenter.js';
 import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
-import { sortByPrice, sortByTime } from '../utils/util.js';
+import { sortByPrice, sortByTime, sortByDay } from '../utils/util.js';
 import { filter } from '../utils/filter-util.js';
 import NewEventPresenter from './new-event-presenter.js';
+import LoadingView from '../view/loading-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 import LackDataView from '../view/lack-data-view.js';
 export default class BoardPresenter {
@@ -19,6 +26,12 @@ export default class BoardPresenter {
   #listEventsComponent = new ListEventsView();
   #sortComponent = null;
   #noEventsComponent = null;
+  #loadingComponent = new LoadingView();
+  #isLoading = true;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
 
   constructor({boardContainer, pointsModel, filterModel, onNewEditDestroy}) {
@@ -44,6 +57,8 @@ export default class BoardPresenter {
     const filteredPoints = filter[this.#filterType](points);
 
     switch (this.#currentEventType) {
+      case SortType.DAY:
+        return filteredPoints.sort(sortByDay);
       case SortType.PRICE:
         return filteredPoints.sort(sortByPrice);
       case SortType.TIME:
@@ -118,23 +133,45 @@ export default class BoardPresenter {
 
   #renderItemsEvent() {
     render(this.#listEventsComponent, this.#boardContainer);
-    for (let i = 0; i < this.#pointsModel.points.length; i++) {
-      this.#renderItemEvent(this.#pointsModel, this.#pointsModel.points[i]);
+    for (let i = 0; i < this.points.length; i++) {
+      this.#renderItemEvent(this.#pointsModel, this.points[i]);
     }
   }
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #renderLoading() {
+    render(this.#loadingComponent, this.#boardContainer);
+  }
+
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
+
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this.#pointsModel.updatePoint(updateType, update);
+        this.#eventsPresenter.get(update.id).setSaving();
+        try {
+          await this.#pointsModel.updatePoint(updateType, update);
+        } catch (err) {
+          this.#eventsPresenter.get(update.id).setAborting();
+        }
         break;
       case UserAction.ADD_POINT:
-        this.#pointsModel.addPoint(updateType, update);
+        this.#newEventPresenter.setSaving();
+        try {
+          await this.#pointsModel.addPoint(updateType, update);
+        } catch(err) {
+          this.#newEventPresenter.setAborting();
+        }
         break;
       case UserAction.DELETE_POINT:
-        this.#pointsModel.deletePoint(updateType, update);
+        this.#eventsPresenter.get(update.id).setDeleting();
+        try {
+          await this.#pointsModel.deletePoint(updateType, update);
+        } catch (err) {
+          this.#eventsPresenter.get(update.id).setAborting();
+        }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
@@ -144,12 +181,15 @@ export default class BoardPresenter {
         break;
       case UpdateType.MINOR:
         this.#clearBoard();
-
         this.#renderBoard();
-
         break;
       case UpdateType.MAJOR:
         this.#clearBoard({resetRenderedTaskCount: true, resetSortType: true});
+        this.#renderBoard();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderBoard();
         break;
     }
@@ -161,6 +201,7 @@ export default class BoardPresenter {
     this.#eventsPresenter.clear();
 
     remove(this.#sortComponent);
+    remove(this.#loadingComponent);
 
     if (this.#noEventsComponent) {
       remove(this.#noEventsComponent);
@@ -173,6 +214,11 @@ export default class BoardPresenter {
 
   #renderBoard() {
     const points = this.points;
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
 
     if (points.length === 0) {
       this.#renderNoEvent();

@@ -1,14 +1,14 @@
 export const SortType = {
-  DEFAULT: 'default',
+  DAY: 'day',
   PRICE: 'price',
   TIME: 'time',
 };
 
 export const FilterType = {
-  EVERYTHING: 'EVERYTHING',
-  FUTURE: 'FUTURE',
-  PRESENT: 'PRESENT',
-  PAST: 'PAST',
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past',
 };
 
 export const UserAction = {
@@ -21,4 +21,5 @@ export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };

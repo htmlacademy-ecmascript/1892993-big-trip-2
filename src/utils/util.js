@@ -50,3 +50,7 @@ export function sortByPrice(eventA, eventB) {
 export function sortByTime(event1, event2) {
   return dayjs(event2.dateTo).diff(dayjs(event2.dateFrom)) - dayjs(event1.dateTo).diff(dayjs(event1.dateFrom));
 }
+
+export function sortByDay(pointA, pointB) {
+  return new Date(pointA.dateFrom) - new Date(pointB.dateFrom);
+}

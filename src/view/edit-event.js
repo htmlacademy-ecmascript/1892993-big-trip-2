@@ -53,7 +53,7 @@ function createGroupDestinationTemplate (allDestinations, type, destination, id)
             <label class="event__label  event__type-output" for="event-destination-${id}">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination ? destination.name : ''}" list="destination-list-${id}">
+            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination ? destination.name : ''}" list="destination-list-${id}" required>
             <datalist id="destination-list-${id}">
               ${allDestinations.map((item) => (`<option value="${item.name}"></option>`)).join('')}
             </datalist>
@@ -63,10 +63,10 @@ function createGroupDestinationTemplate (allDestinations, type, destination, id)
 function createTimeTemplate(id, dateFrom, dateTo) {
   return `<div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-${id}">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${humanizeTaskDueDate(dateFrom, DateFormat.dateTime)}">
+            <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${humanizeTaskDueDate(dateFrom, DateFormat.dateTime)} required>
             &mdash;
             <label class="visually-hidden" for="event-end-time-${id}">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${humanizeTaskDueDate(dateTo, DateFormat.dateTime)}">
+            <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${humanizeTaskDueDate(dateTo, DateFormat.dateTime)} required>
           </div>
   `;
 }
@@ -77,20 +77,20 @@ function createPriceTemplate(id, price = 0) {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-${id}" type="number" name="event-price" value="${price}">
+            <input class="event__input  event__input--price" id="event-price-${id}" type="number" name="event-price" value="${price}" required>
           </div>
   `;
 }
 
-function createButtonsTemplate(id) {
+function createButtonsTemplate(id, isSaving, isDeleting, isDisabled) {
   if (!id) {
     return `
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
         <button class="event__reset-btn" type="reset">Cancel</button>`;
   }
   return `
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Delete</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit ${isDisabled ? 'disabled' : ''}">${isSaving ? 'Saving...' : 'Save'}</button>
+      <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
       </button>`;
@@ -107,8 +107,8 @@ function createPictureTemplate(pictures) {
   return `${pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('')}`;
 }
 
-function createDetailsTemplate (offer, checkedOffer, description, pictures) {
-  const offresTemplate = createOffferTemplate(offer, checkedOffer);
+function createDetailsTemplate (offer, checkedOffer, description, pictures, isDisabled) {
+  const offresTemplate = createOffferTemplate(offer, checkedOffer, isDisabled);
   const descriptionTemplate = createDescriptionTemplate(description);
   const pictureTemplate = createPictureTemplate(pictures);
 
@@ -131,7 +131,16 @@ function createDetailsTemplate (offer, checkedOffer, description, pictures) {
 }
 
 function createEditEventTemplate(point, offers = [], destinations) {
-  const {basePrice, dateFrom, dateTo, type} = point;
+  const {
+    basePrice,
+    dateFrom,
+    dateTo,
+    type,
+    isDisabled,
+    isSaving,
+    isDeleting
+  } = point;
+
   const pointId = point.id || 0;
 
   const typeOffers = offers.find((offer) => offer.type === point.type)?.offers || [];
@@ -141,7 +150,7 @@ function createEditEventTemplate(point, offers = [], destinations) {
   const pictures = destination ? destination.pictures : [];
 
 
-  const buttonsTemplate = createButtonsTemplate(pointId);
+  const buttonsTemplate = createButtonsTemplate(pointId, isSaving, isDeleting, isDisabled);
   const priceTemplate = createPriceTemplate(pointId, basePrice);
   const timeTemplate = createTimeTemplate(pointId, dateFrom, dateTo);
   const destinationTemplate = createGroupDestinationTemplate(destinations, type, destination, pointId);
@@ -150,7 +159,7 @@ function createEditEventTemplate(point, offers = [], destinations) {
 
 
   return `<li class="trip-events__item">
-              <form class="event event--edit" action="#" method="post">
+              <form class="event event--edit" action="#" method="post" ${(isSaving || isDeleting) ? 'disabled' : ''}>
                 <header class="event__header">
                   ${typeTemplate}
 
@@ -322,10 +331,20 @@ export default class EditEventView extends AbstractStatefulView {
   };
 
   static parseEditToState(edit) {
-    return { ...edit };
+    return { ...edit,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
+    };
   }
 
   static parseStateToEdit(state) {
-    return { ...state };
+    const edit = {...state};
+
+    delete edit.isDisabled;
+    delete edit.isSaving;
+    delete edit.isDeleting;
+
+    return edit;
   }
 }
