@@ -29,6 +29,7 @@ const boardPresenter = new BoardPresenter({
   boardContainer: siteTripEventsElement,
   pointsModel,
   filterModel,
+  newEditButtonComponent,
   onNewEditDestroy: handleNewEditFormClose,
 });
 

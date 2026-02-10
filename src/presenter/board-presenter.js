@@ -1,5 +1,5 @@
 import SortView from '../view/sort-view.js';
-import { render, remove } from '../framework/render.js';
+import { render, remove, RenderPosition } from '../framework/render.js';
 import ListEventsView from '../view/list-events.js';
 import EventPresenter from './event-presenter.js';
 import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
@@ -7,6 +7,7 @@ import { sortByPrice, sortByTime, sortByDay } from '../utils/util.js';
 import { filter } from '../utils/filter-util.js';
 import NewEventPresenter from './new-event-presenter.js';
 import LoadingView from '../view/loading-view.js';
+import ErrView from '../view/err-view.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const TimeLimit = {
@@ -27,17 +28,20 @@ export default class BoardPresenter {
   #sortComponent = null;
   #noEventsComponent = null;
   #loadingComponent = new LoadingView();
+  #errComponent = new ErrView();
   #isLoading = true;
+  #newEditButtonComponent = null;
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
     upperLimit: TimeLimit.UPPER_LIMIT
   });
 
 
-  constructor({boardContainer, pointsModel, filterModel, onNewEditDestroy}) {
+  constructor({boardContainer, pointsModel, filterModel, onNewEditDestroy, newEditButtonComponent}) {
     this.#boardContainer = boardContainer;
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
+    this.#newEditButtonComponent = newEditButtonComponent;
 
 
     this.#newEventPresenter = new NewEventPresenter({
@@ -105,7 +109,7 @@ export default class BoardPresenter {
       onSortTypeChange: this.#handleSortTypeChange,
     });
 
-    render(this.#sortComponent, this.#boardContainer);
+    render(this.#sortComponent, this.#boardContainer, RenderPosition.AFTERBEGIN);
   }
 
 
@@ -132,7 +136,6 @@ export default class BoardPresenter {
   }
 
   #renderItemsEvent() {
-    render(this.#listEventsComponent, this.#boardContainer);
     for (let i = 0; i < this.points.length; i++) {
       this.#renderItemEvent(this.#pointsModel, this.points[i]);
     }
@@ -192,6 +195,12 @@ export default class BoardPresenter {
         remove(this.#loadingComponent);
         this.#renderBoard();
         break;
+      case UpdateType.ERROR:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#newEditButtonComponent.element.disabled = true;
+        render(this.#errComponent, this.#boardContainer);
+
     }
   };
 
@@ -214,6 +223,7 @@ export default class BoardPresenter {
 
   #renderBoard() {
     const points = this.points;
+    render(this.#listEventsComponent, this.#boardContainer);
 
     if (this.#isLoading) {
       this.#renderLoading();

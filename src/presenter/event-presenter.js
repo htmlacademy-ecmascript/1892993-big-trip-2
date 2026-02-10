@@ -158,6 +158,10 @@ export default class EventPresenter {
       });
     };
 
+    if (this.#eventEditComponent === null) {
+      return;
+    }
+
     this.#eventEditComponent.shake(resetFormState);
   }
 }
