@@ -74,7 +74,6 @@ export default class NewEventPresenter {
         isDeleting: false,
       });
     };
-
     this.#eventEditComponent.shake(resetFormState);
   }
 }
