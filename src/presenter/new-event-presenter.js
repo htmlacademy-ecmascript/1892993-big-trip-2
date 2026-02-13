@@ -1,6 +1,6 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
 import {UserAction, UpdateType} from '../const.js';
-import EditEventView from '../view/edit-event.js';
+import EditEventView from '../view/edit-event-view.js';
 
 export default class NewEventPresenter {
   #listEventsComponent = null;

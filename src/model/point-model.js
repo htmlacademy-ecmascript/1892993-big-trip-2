@@ -14,15 +14,9 @@ export default class PointModel extends Observable {
     this.#pointsApiService = pointsApiService;
     this.#destinationsApiService = destinationsApiService;
     this.#offerssApiService = offerssApiService;
-
-
-    this.#pointsApiService.points.then(() => {});
-    this.#destinationsApiService.destinations.then(() => {});
-    this.#offerssApiService.offers.then(() => {});
-
   }
 
-  get points(){
+  get points() {
     return this.#points;
   }
 

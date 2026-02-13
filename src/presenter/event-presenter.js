@@ -1,6 +1,6 @@
 import { render, replace, remove } from '../framework/render.js';
-import ItemEventView from '../view/item-event.js';
-import EditEventView from '../view/edit-event.js';
+import ItemEventView from '../view/item-event-view.js';
+import EditEventView from '../view/edit-event-view.js';
 import { UpdateType, UserAction } from '../const.js';
 
 const Mode = {
@@ -33,9 +33,8 @@ export default class EventPresenter {
     const prevEventEditComponent = this.#eventEditComponent;
 
     this.#eventComponent = new ItemEventView({
-      pointsModel: this.#pointsModel,
       point: this.#point,
-      offer: [...this.#pointsModel.getOfferById(this.#point.type, this.#point.offers)],
+      offers: [...this.#pointsModel.getOfferById(this.#point.type, this.#point.offers)],
       destination: this.#pointsModel.getDestinationById(this.#point.destination),
       onEditClick: () => this.#replaceCardToForm(),
       onFavoriteClick: this.#handleFavoriteClick,

@@ -6,15 +6,15 @@ import { DefaultPoint } from '../utils/util.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
-function createOffferTemplate (offer, checkedOffer) {
-  if (offer.length === 0) {
+function createOffferTemplate (offers, checkedOffer) {
+  if (offers.length === 0) {
     return '';
   }
   return `
           <section class="event__section  event__section--offers">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
             <div class="event__available-offers">
-              ${offer.map((item) => (`
+              ${offers.map((item) => (`
               <div class="event__offer-selector">
                 <input class="event__offer-checkbox  visually-hidden" id="${item.id}" type="checkbox" name="event-offer-luggage" ${checkedOffer.find((checkedId) => checkedId.id === item.id) ? 'checked' : null}>
                 <label class="event__offer-label" for="${item.id}">

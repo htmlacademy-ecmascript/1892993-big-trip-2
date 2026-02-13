@@ -3,7 +3,7 @@ import { getTimePeriod, humanizeTaskDueDate } from '../utils/util.js';
 import { DateFormat } from '../const.js';
 import dayjs from 'dayjs';
 
-function createItemEventTemplate(point, offer, destination) {
+function createItemEventTemplate(point, offers, destination) {
   const { basePrice, isFavorite, dateFrom, dateTo, type } = point;
 
   return `<li class="trip-events__item">
@@ -26,7 +26,7 @@ function createItemEventTemplate(point, offer, destination) {
                 </p>
                 <h4 class="visually-hidden">Offers:</h4>
                 <ul class="event__selected-offers">
-                ${offer.map((item) => (`<li class="event__offer">
+                ${offers.map((item) => (`<li class="event__offer">
                     <span class="event__offer-title">${item.title}</span>
                     &plus;&euro;&nbsp;
                     <span class="event__offer-price">${item.price}</span>
@@ -46,19 +46,17 @@ function createItemEventTemplate(point, offer, destination) {
 }
 
 export default class ItemEventView extends AbstractView {
-  #pointsModel = null;
   #point = null;
-  #offer = null;
+  #offers = null;
   #destination = null;
   #handleEditClick = null;
   #handleFavoriteClick = null;
 
 
-  constructor({pointsModel, point, offer, destination, onEditClick, onFavoriteClick}) {
+  constructor({point, offers, destination, onEditClick, onFavoriteClick}) {
     super();
-    this.#pointsModel = pointsModel;
     this.#point = point;
-    this.#offer = offer;
+    this.#offers = offers;
     this.#destination = destination;
     this.#handleEditClick = onEditClick;
     this.#handleFavoriteClick = onFavoriteClick;
@@ -71,7 +69,7 @@ export default class ItemEventView extends AbstractView {
   }
 
   get template() {
-    return createItemEventTemplate(this.#point, this.#offer, this.#destination);
+    return createItemEventTemplate(this.#point, this.#offers, this.#destination);
   }
 
   #editClickHandler = (evt) => {
