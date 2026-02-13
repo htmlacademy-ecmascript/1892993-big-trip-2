@@ -200,7 +200,7 @@ export default class BoardPresenter {
         remove(this.#loadingComponent);
         this.#newEditButtonComponent.element.disabled = true;
         render(this.#errComponent, this.#boardContainer);
-
+        break;
     }
   };
 
